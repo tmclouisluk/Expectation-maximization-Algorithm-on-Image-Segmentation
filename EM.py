@@ -33,17 +33,21 @@ def flatten_img(img_3d):
 # input 2d array >> output 3d array
 def recover_img(img_2d, vis = False, X=800, Y=800, Z=3):
     #img_2d = cv2.resize(img_2d, (0, 0), fx=10, fy=10)
-    recover_img = img_2d.reshape(X*0.1, Y*0.1, Z)
+    img_2d = (img_2d * 255).astype(np.uint8)
+    recover_img = img_2d.reshape(int(X*0.1), int(Y*0.1), Z)
     return recover_img
 
 
 # input 2d array >> output estimated means, stds, pis
 def kmeans_init(img, k):
     means, labels = kmeans2(img, k)
-    means = np.array(means)
-    cov = np.array([np.cov(img[labels == i].T) for i in range(k)])
-    ids = set(labels)
-    pis = np.array([np.sum([labels == i]) / len(labels) for i in ids])
+    try:
+        means = np.array(means)
+        cov = np.array([np.cov(img[labels == i].T) for i in range(k)])
+        ids = set(labels)
+        pis = np.array([np.sum([labels == i]) / len(labels) for i in ids])
+    except Exception as ex:
+        pass
     return means, cov, pis
 
 
