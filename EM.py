@@ -18,7 +18,7 @@ def read_img(filename):
     img_3d = ndimage.imread(filename)
 
     small = cv2.resize(img_3d, (0, 0), fx=0.1, fy=0.1)
-    blur = cv2.blur(small, (2, 2))
+    blur = cv2.blur(small, (4, 4))
     return blur
 
 
@@ -31,10 +31,10 @@ def flatten_img(img_3d):
 
 
 # input 2d array >> output 3d array
-def recover_img(img_2d, vis = False, X=800, Y=800, Z=3):
+def recover_img(img_2d, vis = False, X=80, Y=80, Z=3):
     #img_2d = cv2.resize(img_2d, (0, 0), fx=10, fy=10)
     img_2d = (img_2d * 255).astype(np.uint8)
-    recover_img = img_2d.reshape(int(X*0.1), int(Y*0.1), Z)
+    recover_img = img_2d.reshape(X, Y, Z)
     return recover_img
 
 
@@ -144,10 +144,11 @@ def EM_cluster(img, k, error = 10e-4, iter_n = 9999):
 
 
 def main():
-    FILENAME1 = './img/Co6q3lrygK-AbzQ0AAKvDylHHq4008.jpg'
+    FILENAME1 = './img/john-lawrence-sullivan-aw18.jpg'
     FILENAME2 = './img/Co6q6Fry23KAGdrRAAJBxxyYEHQ922.jpg'
     try:
-        orig_img = read_img(FILENAME2)
+        orig_img = read_img(FILENAME1)
+        x, y, z = orig_img.shape
         plt.figure()
         plt.axis("off")
         plt.imshow(orig_img)
@@ -156,7 +157,7 @@ def main():
 
         img = flatten_img(orig_img)
         labels, means, cov, pis, likelihood_arr = EM_cluster(img, 5)
-        em_img = recover_img(means[labels])
+        em_img = recover_img(means[labels], X=x, Y=y, Z=z)
         plt.figure()
         plt.axis("off")
         plt.imshow(em_img)
